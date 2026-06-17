@@ -26,6 +26,10 @@
 	position: fixed;
 	inset: 0;
 	display: flex;
+	height: 100dvh;
+	min-height: 0;
+	max-height: 100dvh;
+	overflow: hidden;
 	background-color: var(--background-secondary);
 }
 
@@ -226,7 +230,10 @@
 }
 
 .mobileContainer {
-	min-height: 100dvh;
+	height: 100%;
+	min-height: 0;
+	max-height: 100%;
+	box-sizing: border-box;
 	background-color: var(--background-secondary);
 	padding: calc(2rem + env(safe-area-inset-top, 0)) 1.5rem calc(2.5rem + env(safe-area-inset-bottom, 0));
 	overflow-y: auto;
@@ -235,6 +242,7 @@
 }
 
 .mobileContent {
+	flex: 0 0 auto;
 	margin-left: auto;
 	margin-right: auto;
 	width: 100%;
