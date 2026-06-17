@@ -67,13 +67,6 @@ jobs:
       build-version: ${{ needs.meta.outputs.build_version }}
     secrets: inherit
 
-  app-proxy:
-    needs: meta
-    uses: ./.github/workflows/build-app-proxy.yaml
-    with:
-      build-version: ${{ needs.meta.outputs.build_version }}
-    secrets: inherit
-
   app-proxy-self-hosted:
     needs: meta
     uses: ./.github/workflows/build-app-proxy-self-hosted.yaml
