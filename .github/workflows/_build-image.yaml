@@ -44,7 +44,6 @@ defaults:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
-  GHCR_OWNER: ${{ github.repository_owner }}
 
 jobs:
   meta:
@@ -53,6 +52,7 @@ jobs:
     timeout-minutes: 5
     outputs:
       build_version: ${{ steps.vars.outputs.build_version }}
+      ghcr_owner: ${{ steps.owner.outputs.ghcr_owner }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         env:
@@ -69,6 +69,14 @@ jobs:
         run: >-
           cargo run --locked --quiet --manifest-path tools/ci/Cargo.toml -- resolve-calver
           --github-output
+      - name: normalize GHCR owner
+        id: owner
+        env:
+          GHCR_OWNER_RAW: ${{ github.repository_owner }}
+        run: |
+          set -euo pipefail
+          owner_lc="$(printf '%s' "$GHCR_OWNER_RAW" | tr '[:upper:]' '[:lower:]')"
+          printf 'ghcr_owner=%s\n' "$owner_lc" >> "$GITHUB_OUTPUT"
 
   build:
     name: build ${{ matrix.platform }}
@@ -98,7 +106,7 @@ jobs:
           push: true
           provenance: false
           platforms: linux/${{ matrix.platform }}
-          tags: ghcr.io/${{ env.GHCR_OWNER }}/${{ inputs.image }}:${{ needs.meta.outputs.build_version }}-${{ matrix.platform }}
+          tags: ghcr.io/${{ needs.meta.outputs.ghcr_owner }}/${{ inputs.image }}:${{ needs.meta.outputs.build_version }}-${{ matrix.platform }}
           build-args: |
             BUILD_VERSION=${{ needs.meta.outputs.build_version }}
             ${{ inputs.extra-build-args }}
@@ -122,7 +130,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: create and push image manifest
         env:
-          IMAGE: ghcr.io/${{ env.GHCR_OWNER }}/${{ inputs.image }}
+          IMAGE: ghcr.io/${{ needs.meta.outputs.ghcr_owner }}/${{ inputs.image }}
           VERSION: ${{ needs.meta.outputs.build_version }}
           MOVING_TAGS: ${{ inputs.moving-tags }}
         run: |
