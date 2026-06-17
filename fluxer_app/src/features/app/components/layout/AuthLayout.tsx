@@ -40,6 +40,7 @@ const AuthLayoutContent = observer(function AuthLayoutContent({children}: {child
 	const splashUrlRef = useRef<string | null>(null);
 	const registerFormDraftsRef = useRef<Map<string, AuthRegisterFormDraft>>(new Map());
 	const scrollerRef = useRef<ScrollerHandle>(null);
+	const mobileScrollerRef = useRef<HTMLDivElement>(null);
 	const location = useLocation();
 	const {patternReady, splashLoaded, splashDimensions} = useAuthBackground(splashUrl, foodPatternUrl);
 	const handleSetSplashUrl = useCallback(
@@ -70,6 +71,7 @@ const AuthLayoutContent = observer(function AuthLayoutContent({children}: {child
 	}, []);
 	useEffect(() => {
 		scrollerRef.current?.scrollToTop();
+		mobileScrollerRef.current?.scrollTo({top: 0});
 	}, [location.pathname]);
 	const splashScale = useMemo(() => {
 		if (!splashDimensions) return null;
@@ -134,11 +136,9 @@ const AuthLayoutContent = observer(function AuthLayoutContent({children}: {child
 						</div>
 					)}
 					<div className={styles.scrollerWrapper} data-flx="app.auth-layout.auth-layout-content.scroller-wrapper">
-						<Scroller
-							ref={scrollerRef}
+						<div
+							ref={mobileScrollerRef}
 							className={styles.mobileContainer}
-							fade={false}
-							key="auth-layout-mobile-scroller"
 							data-flx="app.auth-layout.auth-layout-content.mobile-container"
 						>
 							<div
@@ -159,7 +159,7 @@ const AuthLayoutContent = observer(function AuthLayoutContent({children}: {child
 								</div>
 								{children}
 							</div>
-						</Scroller>
+						</div>
 					</div>
 				</AuthLayoutContext.Provider>
 			</AuthRegisterDraftContext.Provider>
